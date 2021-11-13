@@ -1,0 +1,18 @@
+.message {
+    border: 2px solid black;
+    border-radius: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 80%;
+    margin-left: 10px;
+}
+.user-container {
+    background-color: gainsboro;
+    border-radius: 12px 12px 0px 0px;
+    font-size: 16px;
+    padding: 2px 5px;
+}
+.message-container {
+    font-size: 20px;
+    padding: 2px 5px;
+}

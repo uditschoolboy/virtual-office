@@ -1,0 +1,36 @@
+.header {
+    height: 5vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 1;
+    height: 100%;
+}
+.buttons-container button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5px;
+    margin-left: 5px;
+    font-size: 20px;
+    height: 80%;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 12px;
+    font-family: 'Noto Sans', sans-serif;
+}
+.buttons-container button:hover {
+    background-color: gray;
+}
+
+.meeting-title-container {
+    flex: 1;
+    height: 100%;
+    padding-left: 10px;
+    font-size: 30px;
+}
