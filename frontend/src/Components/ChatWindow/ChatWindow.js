@@ -2,13 +2,10 @@ import React, { useState } from 'react'
 import './ChatWindow.css';
 import Message from './Message/Message'
 
-const ChatWindow = ({messageList}) => {
+const ChatWindow = ({messageList, sendMessage}) => {
 
     //State for the current message typed in the input box
     const [message, setMessage] = useState('');
-    function sendMessage() {
-
-    }
 
     return (
         <div className="chat-window">
@@ -20,7 +17,7 @@ const ChatWindow = ({messageList}) => {
             </div>
             <div className="send-message-container">
                 <input className="message-input" placeholder="Type message here" value={message} onChange={(e) => setMessage(e.target.value)}/>
-                <button className="send-button" onClick={sendMessage}>Send</button>
+                <button className="send-button" onClick={() => {sendMessage(message); setMessage('');}}>Send</button>
             </div>
         </div>
     )

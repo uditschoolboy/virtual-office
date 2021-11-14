@@ -3,8 +3,10 @@ import MainWindow from './Components/MainWindow/MainWindow';
 import ChatWindow from './Components/ChatWindow/ChatWindow';
 import ParticipantsWindow from './Components/ParticipantsWindow/ParticipantsWindow';
 import Header from './Components/Header/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
+let socket;
 function App() {
 
   /* state windowSettings used for display options of chatwindow and participant window.
@@ -57,44 +59,57 @@ function App() {
   //State for chat - messages List
   const [messageList, setMessageList] = useState([]);
 
-  const tempMessage = [
-    {
-      userName: "Udit Chaudhary",
-      text: "HI there"
-    },
-    {
-      userName: "Prince of Persia",
-      text: "BYe there"
-    },
-    {
-      userName: "Thor",
-      text: "A long long message. A long long message. A long long message. A long long message."
-    },
-    {
-      userName: "Udit Chaudhary",
-      text: "HI there"
-    },
-    {
-      userName: "Prince of Persia",
-      text: "BYe there"
-    },
-    {
-      userName: "Thor",
-      text: "A long long message. A long long message. A long long message. A long long message."
-    },
-    {
-      userName: "Udit Chaudhary",
-      text: "HI there"
-    },
-    {
-      userName: "Prince of Persia",
-      text: "BYe there"
-    },
-    {
-      userName: "Thor",
-      text: "A long long message. A long long message. A long long message. A long long message."
-    }
-  ];
+  //Endpoint of server
+  const ENDPOINT = "localhost:5000";
+
+  //Set up of client side socket. The client with connect to the server throught this socket
+  useEffect(() => {
+    const room = "room1";
+    const name = "Udit";
+
+    //Connection to client
+    socket = io(ENDPOINT);
+    console.log(socket);
+
+    //Joining the given room
+    socket.emit('join-room', {room, name});
+
+    //Cleanup in useEffect
+    // return () => {
+    //   socket.emit('disconnect');
+    //   socket.off();
+    // }
+  }, [ENDPOINT]);
+
+  useEffect(() => {
+
+    //When client receives a new message from server
+    socket.on('message-receive', message => {
+      //Adding the message received to the messageList
+      setMessageList([...messageList, message]);
+    });
+
+    //When client recieves info about the participants of the meeting
+    socket.on('room-info', users => {
+      console.log('someupdate in userList', users);
+      setUserList(users);
+    });    
+
+  }, [messageList, userList]);
+
+
+  //Function to send message from this client to server.
+  function sendMessage(messageText) {
+    let text = messageText.trim();
+    if(text.length === 0) return;
+    const message = {text, userName: "Udit"};
+
+    //Sending the message to others
+    socket.emit('message-send', message);
+
+    //Adding the message to messageList
+    setMessageList([...messageList, message]);
+  }
 
   return (
     <div className="app">
@@ -109,7 +124,7 @@ function App() {
       <div className="content">
         <MainWindow/>
         {windowSettings === 2 && <ParticipantsWindow userList = {userList}/>}
-        {windowSettings === 1 && <ChatWindow messageList = {tempMessage}/>  }
+        {windowSettings === 1 && <ChatWindow messageList = {messageList} sendMessage = {sendMessage}/>  }
       </div> 
     </div>
   );

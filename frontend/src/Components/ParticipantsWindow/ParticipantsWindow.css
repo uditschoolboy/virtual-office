@@ -2,3 +2,11 @@
     flex: 2;
     height: 90vh;
 }
+.participants-window h5 {
+    font-size: 20px;
+    margin-left: 10px;
+}
+.participants-window-header {
+    font-size: 20px;
+    text-align: center;
+}

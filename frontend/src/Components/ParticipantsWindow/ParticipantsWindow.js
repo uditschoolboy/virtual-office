@@ -1,12 +1,13 @@
 import React from 'react'
 import './ParticipantsWindow.css';
 
-const ParticipantsWindow = ({participantList}) => {
+const ParticipantsWindow = ({userList}) => {    
     return (
         <div className="participants-window">
-            {participantList.map(participant => {
+            <div className="participants-window-header">Participants</div>
+            {userList.map((participant,idx) => {
                 return (
-                    <h3>{participant}</h3>
+                    <h5 key={idx}>{participant}</h5>
                 );
             })}
         </div>
