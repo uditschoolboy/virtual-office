@@ -6,3 +6,10 @@ body {
   height: 100vh;
   font-family: 'Noto Sans', sans-serif;
 }
+.button-icons {
+  font-size: 30px;
+}
+.small-icons {
+  font-size: 20px;
+  margin: 0px 2px;
+}

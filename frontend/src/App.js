@@ -32,19 +32,25 @@ function App() {
   //State for handRaise
   const [handRaised, setHandRaised] = useState(false);
   function handRaiseToggle() {
+    const temp = !handRaised
     setHandRaised(!handRaised);
+    socket.emit('handRaise-update', temp);
   }
 
   //State for audio toggle
   const [audio, setAudio] = useState(true);
   function audioToggle() {
+    const temp = !audio;
     setAudio(!audio);
+    socket.emit('audio-update', temp);
   }
 
   //State for video toggle
   const [video, setVideo] = useState(true);
   function videoToggle() {
+    const temp = !video;
     setVideo(!video);
+    socket.emit('video-update', temp);
   }
 
   //State for Screen Share
@@ -72,7 +78,13 @@ function App() {
     console.log(socket);
 
     //Joining the given room
-    socket.emit('join-room', {room, name});
+    socket.emit('join-room', {
+      userName: name,
+      room,
+      mic: audio,
+      camera: video,
+      handRaised
+    });
 
     //Cleanup in useEffect
     // return () => {
@@ -120,6 +132,9 @@ function App() {
         audioToggle = {audioToggle}
         videoToggle = {videoToggle}
         handRaiseToggle = {handRaiseToggle}
+        audio = {audio}
+        video = {video}
+        handRaised = {handRaised}
       />
       <div className="content">
         <MainWindow/>

@@ -17,7 +17,7 @@ const ChatWindow = ({messageList, sendMessage}) => {
             </div>
             <div className="send-message-container">
                 <input className="message-input" placeholder="Type message here" value={message} onChange={(e) => setMessage(e.target.value)}/>
-                <button className="send-button" onClick={() => {sendMessage(message); setMessage('');}}>Send</button>
+                <button className="send-button" onClick={() => {sendMessage(message); setMessage('');}}><span className="material-icons button-icons">send</span></button>
             </div>
         </div>
     )

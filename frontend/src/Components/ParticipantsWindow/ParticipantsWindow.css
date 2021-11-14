@@ -1,12 +1,22 @@
 .participants-window {
     flex: 2;
-    height: 90vh;
+    height: 95vh;
+    border-top: 1px solid black;
 }
-.participants-window h5 {
+.participant-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    border-bottom: 1px solid black;
+    max-height: 60px;
+}
+.participant-container h5 {
     font-size: 20px;
-    margin-left: 10px;
+    margin-right: 3px;
 }
 .participants-window-header {
     font-size: 20px;
     text-align: center;
+    border-bottom: 1px solid black;
 }

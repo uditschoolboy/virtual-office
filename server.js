@@ -1,0 +1,91 @@
+const express = require('express');
+const http = require('http');
+const socketio = require('socket.io');
+//const cors = require('cors');
+
+const app = express();
+const colors = require('colors');
+
+//Make Http server with app variable
+const server = http.createServer(app);
+
+//Set up socket.io
+const io = socketio(server);
+
+//Util methods for user management
+const {getUserById, getUsersInRoom, removeUser, addUser, changeMicStatus, changeCameraStatus, changeHandStatus} = require('./utils/userUtils');
+
+//When someone connects to this server
+io.on('connection', socket => {
+    //When someone joins a room
+    socket.on('join-room', (user) => {
+        //Join the room and inform other in the room about the new connection
+        console.log("A user has joined".yellow);
+        const room = user.room;
+        console.log(user.room, user.userName);
+        //socket joins the room
+        user['id'] = socket.id;
+        socket.join(user.room);
+
+        //Add this user and update other users with this new user's details.
+        addUser(user);
+        updateUsersInRoom();
+
+        //When a client generates a new message.
+        socket.on('message-send', (message) => {
+            console.log(`Message received on server`.magenta.bold);
+            //Broadcasting the message to others in the same room
+            socket.broadcast.to(room).emit('message-receive', message);
+        });
+
+
+
+        //Status updates : Handraise, audio on/off, video on/off
+        socket.on('handRaise-update', (status) => {
+            changeHandStatus(socket.id, status);
+            updateUsersInRoom();
+        });
+
+        socket.on('audio-update', (status) => {
+            changeMicStatus(socket.id, status);
+            updateUsersInRoom();
+        });
+
+        socket.on('video-update', (status) => {
+            changeCameraStatus(socket.id, status);
+            updateUsersInRoom();
+        });
+
+
+
+
+        //When user disconnects from server
+        socket.on('disconnect', () => {
+            removeUser(socket.id);
+            updateUsersInRoom();
+            console.log(`${socket.id} has disconnected`.magenta);
+        });
+
+        //Function for updating the clients about all the users in room with user details
+        function updateUsersInRoom() {
+            //Notify all room users about the list of participants
+            const allUsersInRoom = getUsersInRoom(room);
+            //userList will be sent to client
+            const userList = allUsersInRoom.map(user => {
+                return {
+                    userName: user.userName,
+                    mic: user.mic,
+                    camera: user.camera,
+                    handRaised: user.handRaised
+                }
+            });
+            io.to(room).emit('room-info', userList);
+        }
+    });
+});
+
+
+//Set up the server on port 5000
+server.listen(5000, () => {
+    console.log("Start hogaya Server".yellow.bold);
+});

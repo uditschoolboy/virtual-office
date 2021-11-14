@@ -4,7 +4,7 @@ import './MainWindow.css';
 const MainWindow = () => {
     return (
         <div className="main-window">
-            BlackScreen
+            VideoScreen
         </div>
     )
 }
