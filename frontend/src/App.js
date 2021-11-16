@@ -3,8 +3,9 @@ import MainWindow from './Components/MainWindow/MainWindow';
 import ChatWindow from './Components/ChatWindow/ChatWindow';
 import ParticipantsWindow from './Components/ParticipantsWindow/ParticipantsWindow';
 import Header from './Components/Header/Header';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, cloneElement } from 'react';
 import io from 'socket.io-client';
+import Peer from 'peerjs';
 
 let socket;
 function App() {
@@ -13,6 +14,7 @@ function App() {
   windowSettings = 0 means show only MainWindow.
   windowSettings = 1 means show MainWindow and ChatWindow.
   windowSettings = 3 means show MainWindow and ParticipantsWindow */
+
   const [windowSettings, setWindowSettings] = useState(0);
   function participantsWindowToggle() {
     if(windowSettings === 2) {
@@ -65,6 +67,9 @@ function App() {
   //State for chat - messages List
   const [messageList, setMessageList] = useState([]);
 
+  //State for hashing peerId to call object
+  const [peers, setPeers] = useState({});
+
   //Endpoint of server
   const ENDPOINT = "localhost:5000";
 
@@ -77,14 +82,17 @@ function App() {
     socket = io(ENDPOINT);
     console.log(socket);
 
-    //Joining the given room
+
+      //Joining the given room
     socket.emit('join-room', {
       userName: name,
       room,
       mic: audio,
       camera: video,
       handRaised
-    });
+    });      
+
+
 
     //Cleanup in useEffect
     // return () => {
@@ -108,6 +116,8 @@ function App() {
     });    
 
   }, [messageList, userList]);
+
+
 
 
   //Function to send message from this client to server.
