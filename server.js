@@ -9,8 +9,18 @@ const colors = require('colors');
 //Make Http server with app variable
 const server = http.createServer(app);
 
+//running peer on this express server
+const {ExpressPeerServer} = require('peer');
+const peerServer = ExpressPeerServer(server, {
+    debug: true
+});
+
+
 //Set up socket.io
 const io = socketio(server);
+
+//Set up peerjs route
+app.use('/peerjs', peerServer);
 
 //Util methods for user management
 const {getUserById, getUsersInRoom, removeUser, addUser, changeMicStatus, changeCameraStatus, changeHandStatus} = require('./utils/userUtils');
@@ -20,11 +30,12 @@ io.on('connection', socket => {
     //When someone joins a room
     socket.on('join-room', (user) => {
         //Join the room and inform other in the room about the new connection
-        console.log("A user has joined".yellow);
         const room = user.room;
-        console.log(user.room, user.userName);
         //socket joins the room
         user['id'] = socket.id;
+        console.log("This person joined".yellow);
+        console.log(user);
+        socket.broadcast.to(room).emit('stream-update', (user.peerId));
         socket.join(user.room);
 
         //Add this user and update other users with this new user's details.
@@ -61,6 +72,8 @@ io.on('connection', socket => {
 
         //When user disconnects from server
         socket.on('disconnect', () => {
+            const user = getUserById(socket.id);
+            socket.broadcast.to(room).emit('stream-stop', user.peerId);
             removeUser(socket.id);
             updateUsersInRoom();
             console.log(`${socket.id} has disconnected`.magenta);

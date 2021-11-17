@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     border-top: 1px solid black;
+    border-left: 1px solid black;
 }
 .chat-header {
     font-size: 20px;

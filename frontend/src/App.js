@@ -43,6 +43,8 @@ function App() {
   const [audio, setAudio] = useState(true);
   function audioToggle() {
     const temp = !audio;
+    //Set audio settings on stream
+    myMediaStream.getAudioTracks()[0].enabled = temp;
     setAudio(!audio);
     socket.emit('audio-update', temp);
   }
@@ -51,6 +53,8 @@ function App() {
   const [video, setVideo] = useState(true);
   function videoToggle() {
     const temp = !video;
+    //Set video settings on Stream
+    myMediaStream.getVideoTracks()[0].enabled = temp;
     setVideo(!video);
     socket.emit('video-update', temp);
   }
@@ -67,8 +71,18 @@ function App() {
   //State for chat - messages List
   const [messageList, setMessageList] = useState([]);
 
-  //State for hashing peerId to call object
-  const [peers, setPeers] = useState({});
+
+  //State for keeping the id provided by my Peer.
+  const [myPeerId, setMyPeerId] = useState(null);
+
+  //State for mymediastream
+  const [myMediaStream, setMyMediaStream] = useState(null);
+  const [mediaStream1, setMediaStream1] = useState(null);
+  const [mediaStream2, setMediaStream2] = useState(null);
+  const [mediaStream3, setMediaStream3] = useState(null);
+  
+  //Mapping streams-slots to peerId
+  const[peers, setPeers] = useState({});
 
   //Endpoint of server
   const ENDPOINT = "localhost:5000";
@@ -82,17 +96,57 @@ function App() {
     socket = io(ENDPOINT);
     console.log(socket);
 
+    //Opening a peer connection, initialising a peer variable
+    var peer = new Peer(undefined, {
+      path: '/peerjs',
+      host: '/',
+      port: '5000'
+    });
 
-      //Joining the given room
-    socket.emit('join-room', {
-      userName: name,
-      room,
-      mic: audio,
-      camera: video,
-      handRaised
+    //When a peer connection opens
+    peer.on('open', id => {
+      //Join the given room with socket
+      setMyPeerId(id);
+      socket.emit('join-room', {
+        userName: name,
+        peerId: id,
+        room,
+        mic: audio,
+        camera: video,
+        handRaised
+      });
     });      
 
+    navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    }).then(myMediaStream => {
+      //Get my media stream and display it.
+      setMyMediaStream(myMediaStream);
 
+      //Listen to stream-update event on socket and then call that user to get the user's stream
+      socket.on('stream-update', (userPeerId) => {
+        //Calling that new user and sending the stream
+        console.log(userPeerId, " has joined so i will to call him");
+        const call = peer.call(userPeerId, myMediaStream);
+        //when that user sends back his stream then update the peers state
+        call.on('stream', remoteVideoStream => {
+          console.log("okay got a stream from ", userPeerId);
+          setUserStream(userPeerId, remoteVideoStream);
+        });
+      });
+      
+      //When someother user calls you then you need to reply with your stream
+      peer.on('call', call => {
+        call.answer(myMediaStream);
+        console.log("Received a call");
+        console.log(call.peer);
+        call.on('stream', remoteVideoStream => {
+          console.log("okay got a stream from ", call.peer);
+          setUserStream(call.peer, remoteVideoStream);
+        });
+      });
+    });
 
     //Cleanup in useEffect
     // return () => {
@@ -115,8 +169,46 @@ function App() {
       setUserList(users);
     });    
 
-  }, [messageList, userList]);
+    //When stream stops from a user then remove their audio/video
+    socket.on('stream-stop', userPeerId => {
+      if(peers[userPeerId]) {
+        if(peers[userPeerId] === 1) {
+          setMediaStream1(null);
+        } else if(peers[userPeerId] === 2) {
+          setMediaStream2(null);
+        } else {
+          setMediaStream3(null);
+        }
+      }
+    });
 
+  }, [messageList, userList, peers]);
+
+
+  //function to set A users media stream
+  function setUserStream(userPeerId, stream) {
+    console.log("Setting user Stream");
+    if(peers[userPeerId]) {
+      if(peers[userPeerId] === 1) {
+        setMediaStream1(stream);
+      } else if(peers[userPeerId] === 2) {
+        setMediaStream2(stream);
+      } else {
+        setMediaStream3(stream);
+      }
+      return;
+    }
+    if(!mediaStream1) {
+      peers[userPeerId] = 1;
+      setMediaStream1(stream);
+    } else if(!mediaStream2) {
+      peers[userPeerId] = 2;
+      setMediaStream2(stream);
+    } else if(!mediaStream3) {
+      peers[userPeerId] = 3;
+      setMediaStream3(stream);
+    }
+  }
 
 
 
@@ -147,7 +239,12 @@ function App() {
         handRaised = {handRaised}
       />
       <div className="content">
-        <MainWindow/>
+        <MainWindow
+          myMediaStream = {myMediaStream}
+          mediaStream1 = {mediaStream1}
+          mediaStream2 = {mediaStream2}
+          mediaStream3 = {mediaStream3}
+        />
         {windowSettings === 2 && <ParticipantsWindow userList = {userList}/>}
         {windowSettings === 1 && <ChatWindow messageList = {messageList} sendMessage = {sendMessage}/>  }
       </div> 

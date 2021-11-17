@@ -2,6 +2,7 @@
     flex: 2;
     height: 95vh;
     border-top: 1px solid black;
+    border-left: 1px solid black;
 }
 .participant-container {
     display: flex;
