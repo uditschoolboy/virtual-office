@@ -82,7 +82,13 @@ function App() {
   const [mediaStream3, setMediaStream3] = useState(null);
   
   //Mapping streams-slots to peerId
-  const[peers, setPeers] = useState({});
+  const peers = {};
+  const revPeers = [
+    true,
+    false,
+    false,
+    false
+  ];
 
   //Endpoint of server
   const ENDPOINT = "localhost:5000";
@@ -165,7 +171,7 @@ function App() {
 
     //When client recieves info about the participants of the meeting
     socket.on('room-info', users => {
-      console.log('someupdate in userList', users);
+      //console.log('someupdate in userList', users);
       setUserList(users);
     });    
 
@@ -174,11 +180,15 @@ function App() {
       if(peers[userPeerId]) {
         if(peers[userPeerId] === 1) {
           setMediaStream1(null);
+          revPeers[1] = null;
         } else if(peers[userPeerId] === 2) {
           setMediaStream2(null);
+          revPeers[2] = null;
         } else {
           setMediaStream3(null);
+          revPeers[3] = null;
         }
+        peers[userPeerId] = null;
       }
     });
 
@@ -187,7 +197,6 @@ function App() {
 
   //function to set A users media stream
   function setUserStream(userPeerId, stream) {
-    console.log("Setting user Stream");
     if(peers[userPeerId]) {
       if(peers[userPeerId] === 1) {
         setMediaStream1(stream);
@@ -198,13 +207,19 @@ function App() {
       }
       return;
     }
-    if(!mediaStream1) {
+    if(!mediaStream1 && !revPeers[1]) {
+      console.log("Setting stream 1");
       peers[userPeerId] = 1;
+      revPeers[1] = true;
       setMediaStream1(stream);
-    } else if(!mediaStream2) {
+    } else if(!mediaStream2 && !revPeers[2]) {
+      console.log("Setting stream 2");
+      revPeers[2] = true;
       peers[userPeerId] = 2;
       setMediaStream2(stream);
-    } else if(!mediaStream3) {
+    } else if(!mediaStream3 && !revPeers[3]) {
+      console.log("Setting stream 3");
+      revPeers[3] = true;
       peers[userPeerId] = 3;
       setMediaStream3(stream);
     }
