@@ -1,0 +1,15 @@
+.video-window {
+    width: 650px;
+    height: 450px;
+    border: 10px solid black;
+    border-radius: 12px;
+    background-color: black;
+    object-fit:cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.video-window video {
+    max-width: 100%;
+    max-height: 100%;
+}
