@@ -1,10 +1,11 @@
 import React from 'react'
-import './MainWindow.css';
+import './ContentWindow.css';
 import VideoWindow from './VideoWindow/VideoWindow';
 
-const MainWindow = ({myMediaStream, mediaStream1, mediaStream2, mediaStream3}) => {
+const ContentWindow = ({screenShare, myMediaStream, mediaStream1, mediaStream2, mediaStream3}) => {
     return (
-        <div className="main-window">
+        <div className="content-window">
+            {screenShare && <VideoWindow mediaStream={screenShare}/>}
             {myMediaStream && <VideoWindow muted={true} mediaStream={myMediaStream}/>}
             {mediaStream1 && <VideoWindow mediaStream={mediaStream1}/>}
             {mediaStream2 && <VideoWindow mediaStream={mediaStream2}/>}
@@ -13,4 +14,4 @@ const MainWindow = ({myMediaStream, mediaStream1, mediaStream2, mediaStream3}) =
     )
 }
 
-export default MainWindow
+export default ContentWindow

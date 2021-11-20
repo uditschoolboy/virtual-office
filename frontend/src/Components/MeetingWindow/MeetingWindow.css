@@ -1,0 +1,9 @@
+.meeting-window {
+    width: 100vw;
+    height: 100vh;
+}
+.content {
+    height: 95vh;
+    display: flex;
+    align-items: center;
+}

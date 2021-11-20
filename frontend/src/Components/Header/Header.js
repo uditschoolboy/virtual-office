@@ -1,7 +1,7 @@
 import React from 'react'
 import './Header.css';
 
-const Header = ({meetingTitle, chatWindowToggle, participantsWindowToggle, audioToggle, videoToggle, screenShareToggle, handRaiseToggle, audio, video, handRaised}) => {
+const Header = ({meetingTitle, chatWindowToggle, participantsWindowToggle, audioToggle, videoToggle, handRaiseToggle, audio, video, handRaised, leaveMeeting}) => {
     return (
         <div className="header">
             <div className="meeting-title-container">{meetingTitle}</div>
@@ -15,10 +15,9 @@ const Header = ({meetingTitle, chatWindowToggle, participantsWindowToggle, audio
                 <button onClick={audioToggle}>
                     {audio ? <i className="material-icons button-icons">mic</i> : <span className="material-icons button-icons">mic_off</span>}
                 </button>
-                <button onClick={screenShareToggle}><span className="material-icons button-icons">screen_share</span></button>
                 <button onClick={participantsWindowToggle}><span className="material-icons button-icons">people</span></button>
                 <button onClick={chatWindowToggle}><span className="material-icons button-icons">chat</span></button>
-                <button  style={{backgroundColor:"red", cursor:"pointer"}}><span className="material-icons button-icons">call_end</span></button>
+                <button onClick={leaveMeeting} style={{backgroundColor:"red", cursor:"pointer"}}><span className="material-icons button-icons">call_end</span></button>
             </div>
         </div>
     )

@@ -1,13 +1,17 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
-//const cors = require('cors');
+const cors = require('cors');
 
 const app = express();
 const colors = require('colors');
 
 //Make Http server with app variable
 const server = http.createServer(app);
+
+//Use cors
+app.use(cors());
+
 
 //running peer on this express server
 const {ExpressPeerServer} = require('peer');
@@ -16,8 +20,13 @@ const peerServer = ExpressPeerServer(server, {
 });
 
 
-//Set up socket.io
-const io = socketio(server);
+//Set up socket.io with cors for all clients
+const io = socketio(server, {
+    cors : {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 //Set up peerjs route
 app.use('/peerjs', peerServer);
@@ -66,7 +75,6 @@ io.on('connection', socket => {
             changeCameraStatus(socket.id, status);
             updateUsersInRoom();
         });
-
 
 
 
